@@ -27,7 +27,7 @@ export default function ClientHome({ data }: { data: PageData }) {
       <AnimatePresence>
         {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
       </AnimatePresence>
-      <main className="relative" style={{ visibility: loaded ? 'visible' : 'hidden' }}>
+      <main className="public-root relative" style={{ visibility: loaded ? 'visible' : 'hidden' }}>
         <Navbar personal={data.personal} />
         <Hero personal={data.personal} stats={data.stats} rotatingChips={data.rotatingChips} />
         <CareerTimeline career={data.career} />
