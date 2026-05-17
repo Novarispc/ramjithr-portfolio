@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import type { JourneyEntry } from '@/lib/content-schema'
 
@@ -14,11 +14,20 @@ interface Props {
 
 const GLOBE_TEXTURE = 'https://unpkg.com/three-globe/example/img/earth-night.jpg'
 const BG_TEXTURE = 'https://unpkg.com/three-globe/example/img/night-sky.png'
+const COUNTRIES_URL = 'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson'
 
 export default function GlobeCanvas({ entries, selectedId, onSelect, height = 540 }: Props) {
   const globeRef = useRef<any>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const sizeRef = useRef({ w: 0, h: height })
+  const [countries, setCountries] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch(COUNTRIES_URL)
+      .then(r => r.json())
+      .then(data => setCountries(data.features ?? []))
+      .catch(() => {})
+  }, [])
 
   const points = useMemo(
     () => entries.map(e => ({
@@ -111,6 +120,12 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         showAtmosphere
         atmosphereColor="#00ff87"
         atmosphereAltitude={0.18}
+        polygonsData={countries}
+        polygonAltitude={0.008}
+        polygonCapColor={() => 'rgba(0,255,135,0.04)'}
+        polygonSideColor={() => 'rgba(0,255,135,0.08)'}
+        polygonStrokeColor={() => 'rgba(0,255,135,0.55)'}
+        polygonLabel={() => ''}
         pointsData={points}
         pointLat={(d: any) => d.lat}
         pointLng={(d: any) => d.lng}
