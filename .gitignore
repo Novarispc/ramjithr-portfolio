@@ -13,6 +13,10 @@ next-dev.out.log
 .env
 .env.local
 .env*.local
+.deploy-creds.txt
+
+# vercel link metadata
+.vercel
 
 # admin content + history (server-managed)
 /data
