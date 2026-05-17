@@ -65,7 +65,7 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     if (!g || !selectedId) return
     const target = entries.find(e => e.id === selectedId)
     if (!target) return
-    g.pointOfView?.({ lat: target.lat, lng: target.lng, altitude: 1.6 }, 1200)
+    g.pointOfView?.({ lat: target.lat, lng: target.lng, altitude: 0.5 }, 1200)
     const controls = g.controls?.()
     if (controls) controls.autoRotate = false
   }, [selectedId, entries])
@@ -115,8 +115,8 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         pointLat={(d: any) => d.lat}
         pointLng={(d: any) => d.lng}
         pointColor={(d: any) => d.color}
-        pointAltitude={(d: any) => 0.012 + d.size * 0.02}
-        pointRadius={(d: any) => 0.35 + d.size * 0.25}
+        pointAltitude={(d: any) => 0.01 + d.size * 0.01}
+        pointRadius={(d: any) => 0.18 + d.size * 0.12}
         pointLabel={(d: any) => `
           <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid rgba(0,255,135,0.4); padding: 8px 12px; border-radius: 8px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.6);">
             <div style="font-weight: 700; font-size: 12px;">${escapeHtml(d.place)}</div>
