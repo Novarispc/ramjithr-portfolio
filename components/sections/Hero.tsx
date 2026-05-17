@@ -203,17 +203,17 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
       {/* Dot grid background */}
       <DotGrid />
 
-      {/* Ambient orbs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[15%] left-[10%] w-[500px] h-[500px] rounded-full bg-[#00ff87]/4 blur-[130px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] rounded-full bg-[#c9a84c]/4 blur-[110px]" />
-        <div className="absolute top-[60%] left-[50%] w-[300px] h-[300px] rounded-full bg-[#60a5fa]/3 blur-[100px]" />
+      {/* Ambient orbs — scaled down on small screens to prevent overflow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[15%] left-[10%] w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] rounded-full bg-[#00ff87]/4 blur-[80px] sm:blur-[110px] lg:blur-[130px]" />
+        <div className="absolute bottom-[20%] right-[10%] w-[260px] h-[260px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px] rounded-full bg-[#c9a84c]/4 blur-[70px] sm:blur-[90px] lg:blur-[110px]" />
+        <div className="absolute top-[60%] left-[50%] w-[220px] h-[220px] sm:w-[280px] sm:h-[280px] lg:w-[300px] lg:h-[300px] rounded-full bg-[#60a5fa]/3 blur-[60px] sm:blur-[80px] lg:blur-[100px]" />
       </div>
 
       {/* Main content */}
       <div className="relative z-10 flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto px-6 w-full py-16">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full py-10 sm:py-14 lg:py-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             {/* ── Left ── */}
             <div>
@@ -240,7 +240,7 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h1 className="text-5xl md:text-6xl xl:text-7xl font-black leading-[0.9] tracking-tight uppercase">
+                <h1 className="text-[2.5rem] xs:text-5xl sm:text-5xl md:text-6xl xl:text-7xl font-black leading-[0.9] tracking-tight uppercase break-words">
                   <span className="text-white block">{firstName || personal.name}</span>
                   {lastName && (
                     <span
@@ -263,10 +263,10 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.25 }}
-                className="text-[#a3a3a3] text-lg md:text-xl font-light mt-5 mb-1 flex items-center gap-2"
+                className="text-[#a3a3a3] text-base sm:text-lg md:text-xl font-light mt-5 mb-1 flex items-center gap-2"
               >
-                <Zap size={16} className="text-[#00ff87]" />
-                {personal.title}
+                <Zap size={16} className="text-[#00ff87] flex-shrink-0" />
+                <span className="break-words">{personal.title}</span>
               </motion.p>
 
               {/* Typewriter tagline */}
@@ -284,11 +284,11 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.45 }}
-                className="flex flex-wrap items-center gap-3 mb-12"
+                className="flex flex-wrap items-center gap-2 sm:gap-3 mb-10 sm:mb-12"
               >
                 <a
                   href="#career"
-                  className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm group transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl font-semibold text-sm group transition-all duration-200 min-h-[44px]"
                   style={{ backgroundColor: '#00ff87', color: '#080808' }}
                   onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#00e87a')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#00ff87')}
@@ -299,7 +299,7 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                 <a
                   href="/resume.pdf"
                   download
-                  className="flex items-center gap-2 px-6 py-3.5 rounded-xl border text-white font-medium text-sm transition-all duration-200 hover:bg-white/8"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl border text-white font-medium text-sm transition-all duration-200 hover:bg-white/8 min-h-[44px]"
                   style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
                 >
                   <FileText size={16} />
@@ -307,7 +307,7 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                 </a>
                 <a
                   href="#contact"
-                  className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-[#a3a3a3] font-medium text-sm hover:text-white transition-colors duration-200"
+                  className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl text-[#a3a3a3] font-medium text-sm hover:text-white transition-colors duration-200 min-h-[44px]"
                 >
                   <Mail size={16} />
                   Contact
@@ -319,20 +319,20 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.55 }}
-                className="grid grid-cols-2 md:grid-cols-4 gap-3"
+                className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3"
               >
                 {stats.map((stat, i) => (
                   <motion.div
                     key={stat.id ?? i}
                     whileHover={{ y: -2, borderColor: 'rgba(0,255,135,0.2)' }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                    className="p-4 rounded-xl border transition-all duration-300"
+                    className="p-3 sm:p-4 rounded-xl border transition-all duration-300"
                     style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)' }}
                   >
-                    <div className="text-2xl font-black text-white mb-0.5">
+                    <div className="text-xl sm:text-2xl font-black text-white mb-0.5">
                       <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                     </div>
-                    <div className="text-[10px] uppercase tracking-widest leading-tight" style={{ color: '#555' }}>
+                    <div className="text-[9px] sm:text-[10px] uppercase tracking-widest leading-tight" style={{ color: '#555' }}>
                       {stat.label}
                     </div>
                   </motion.div>
@@ -364,12 +364,12 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
         <Marquee items={rotatingChips} speed={28} />
       </motion.div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — hidden on small screens to avoid overlap */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6 }}
-        className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+        className="hidden md:flex absolute bottom-20 left-1/2 -translate-x-1/2 flex-col items-center gap-2 z-10"
       >
         <span className="text-[#333] text-[10px] tracking-[0.3em] uppercase font-mono">scroll</span>
         <div className="w-px h-8 overflow-hidden">

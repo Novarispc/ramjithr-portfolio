@@ -110,7 +110,7 @@ export default function LifeTimeline({ entries }: { entries: Timeline[] }) {
   const TOTAL_H = ABOVE_H + CONN_H + DOT_H + CONN_H + YEAR_H + BELOW_H
 
   return (
-    <section id="timeline" className="py-24 bg-[#0d0d0d] overflow-hidden">
+    <section id="timeline" className="py-16 sm:py-20 lg:py-24 bg-[#0d0d0d] overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -121,8 +121,8 @@ export default function LifeTimeline({ entries }: { entries: Timeline[] }) {
         >
           <div>
             <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">05 · Life Story</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-3">Life Timeline</h2>
-            <p className="text-[#a3a3a3] text-lg">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3">Life Timeline</h2>
+            <p className="text-[#a3a3a3] text-base sm:text-lg">
               From Pollachi to Gothenburg — every chapter that shaped the engineer.
             </p>
           </div>

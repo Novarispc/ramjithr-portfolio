@@ -80,13 +80,16 @@ export default function JourneyDetailModal({ entry, onClose }: Props) {
             style={{
               position: 'fixed',
               top: 0, right: 0, bottom: 0,
-              width: 'min(560px, 96vw)',
+              width: 'min(560px, 100vw)',
+              maxWidth: '100vw',
               background: '#0e0e10',
               borderLeft: '1px solid rgba(255,255,255,0.08)',
               zIndex: 91,
               display: 'flex',
               flexDirection: 'column',
               fontFamily: 'Inter, system-ui, sans-serif',
+              paddingTop: 'env(safe-area-inset-top, 0)',
+              paddingBottom: 'env(safe-area-inset-bottom, 0)',
             }}
           >
             <button
@@ -105,13 +108,10 @@ export default function JourneyDetailModal({ entry, onClose }: Props) {
               <X size={16} />
             </button>
 
-            <div style={{
-              position: 'relative',
-              height: 320,
-              background: '#000',
-              flexShrink: 0,
-              overflow: 'hidden',
-            }}>
+            <div
+              className="relative bg-black flex-shrink-0 overflow-hidden"
+              style={{ height: 'clamp(220px, 38vh, 340px)' }}
+            >
               {entry.images.length === 0 ? (
                 <div style={{
                   height: '100%', display: 'flex', flexDirection: 'column',
@@ -191,11 +191,11 @@ export default function JourneyDetailModal({ entry, onClose }: Props) {
               )}
             </div>
 
-            <div style={{ padding: 28, overflowY: 'auto', flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#00ff87', fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8 }}>
+            <div className="p-5 sm:p-7 overflow-y-auto flex-1">
+              <div className="flex items-center gap-2 text-[#00ff87] text-[11px] tracking-[0.2em] uppercase mb-2">
                 <MapPin size={12} /> {entry.country}{entry.region ? ` · ${entry.region}` : ''}
               </div>
-              <h2 style={{ fontSize: 32, fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: 12, letterSpacing: '-0.01em' }}>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-[1.1] mb-3 tracking-[-0.01em] break-words">
                 {entry.place}
               </h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#a3a3a3', fontSize: 13, marginBottom: 14 }}>

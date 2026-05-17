@@ -14,13 +14,13 @@ export default function SpecialTrackers({ languages }: { languages: Language[] }
   if (!named.length) return null
 
   return (
-    <section id="trackers" className="py-24 px-6 bg-[#0d0d0d]">
+    <section id="trackers" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-[#0d0d0d]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <div className="mb-12">
             <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">06 · Languages</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Languages Spoken</h2>
-            <p className="text-[#a3a3a3] text-lg max-w-xl">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">Languages Spoken</h2>
+            <p className="text-[#a3a3a3] text-base sm:text-lg max-w-xl">
               Communication across borders — the spoken languages alongside the technical ones.
             </p>
           </div>

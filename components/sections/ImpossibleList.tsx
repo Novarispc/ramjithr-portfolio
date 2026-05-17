@@ -32,14 +32,14 @@ export default function ImpossibleList({ achievements }: { achievements: Achieve
   const totalItems = flat.length
 
   return (
-    <section id="impossible" className="py-24 px-6 bg-[#0d0d0d]">
+    <section id="impossible" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-[#0d0d0d]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
               <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">07 · Life Goals</p>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Impossible List</h2>
-              <p className="text-[#a3a3a3] text-lg max-w-xl">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">Impossible List</h2>
+              <p className="text-[#a3a3a3] text-base sm:text-lg max-w-xl">
                 Not a bucket list. An evolving record of things worth pursuing — completed, in progress, and dreamed.
               </p>
             </div>

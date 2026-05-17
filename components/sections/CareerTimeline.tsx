@@ -131,13 +131,13 @@ function TimelineCard({ entry, index, isCurrent }: { entry: Career; index: numbe
 export default function CareerTimeline({ career }: { career: Career[] }) {
   const lastIdx = career.length - 1
   return (
-    <section id="career" className="py-24 px-6">
+    <section id="career" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <ScrollReveal>
           <div className="mb-16">
             <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">02 · Experience</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Career Timeline</h2>
-            <p className="text-[#a3a3a3] text-lg max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">Career Timeline</h2>
+            <p className="text-[#a3a3a3] text-base sm:text-lg max-w-2xl">
               10+ years navigating the full stack of automotive software validation — from telematics to EV exterior systems at Volvo Cars.
             </p>
           </div>

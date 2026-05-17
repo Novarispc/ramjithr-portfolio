@@ -74,19 +74,19 @@ export default function GlobalJourney({ journey }: { journey: JourneyEntry[] }) 
   if (!journey.length) return null
 
   return (
-    <section id="journey" className="py-24 px-6">
+    <section id="journey" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
-          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <div className="mb-8 sm:mb-10 lg:mb-12 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 sm:gap-6">
             <div>
-              <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">08 · Journey</p>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-3">Global Journey</h2>
-              <p className="text-[#a3a3a3] text-lg max-w-xl">
+              <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-3 sm:mb-4">08 · Journey</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3">Global Journey</h2>
+              <p className="text-[#a3a3a3] text-base sm:text-lg max-w-xl">
                 Every place left a mark. Spin the globe, click a pin, see the trip.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <StatTile icon={<Plane size={13} />} value={stats.trips} label="Trips" />
               <StatTile icon={<MapPin size={13} />} value={stats.countries} label="Countries" />
               <StatTile icon={<ImageIcon size={13} />} value={stats.photos} label="Photos" />
@@ -95,8 +95,11 @@ export default function GlobalJourney({ journey }: { journey: JourneyEntry[] }) 
         </ScrollReveal>
 
         <ScrollReveal>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 18, alignItems: 'center' }}>
-            <div style={{ display: 'inline-flex', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: 3 }}>
+          <div className="flex flex-wrap items-center gap-3 mb-4 sm:mb-5">
+            <div
+              className="inline-flex rounded-[10px] p-[3px]"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
               <ToggleBtn active={view === 'globe'} onClick={() => setView('globe')} disabled={isMobile}>
                 <Globe2 size={13} /> Globe
               </ToggleBtn>
@@ -105,23 +108,20 @@ export default function GlobalJourney({ journey }: { journey: JourneyEntry[] }) 
               </ToggleBtn>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', color: '#888', fontSize: 12 }}>
-              <Filter size={12} style={{ color: '#666' }} />
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-xs text-[#888] w-full sm:w-auto sm:flex-1">
+              <Filter size={12} className="text-[#666]" />
               <FilterSelect value={yearFilter} onChange={setYearFilter} options={[['all', 'All years'], ...years.map(y => [y, y] as [string, string])]} />
               <FilterSelect value={countryFilter} onChange={setCountryFilter} options={[['all', 'All countries'], ...countries.map(c => [c, c] as [string, string])]} />
               {(yearFilter !== 'all' || countryFilter !== 'all') && (
                 <button
                   onClick={() => { setYearFilter('all'); setCountryFilter('all') }}
-                  style={{
-                    background: 'transparent', border: 'none', color: '#00ff87',
-                    cursor: 'pointer', fontSize: 12, padding: '4px 8px',
-                  }}
+                  className="text-[#00ff87] text-xs px-2 py-1 bg-transparent border-none cursor-pointer"
                 >
                   Reset
                 </button>
               )}
-              <span style={{ color: '#555', fontSize: 11, marginLeft: 'auto' }}>
-                Showing {filtered.length} of {journey.length}
+              <span className="text-[#555] text-[11px] sm:ml-auto whitespace-nowrap">
+                {filtered.length}/{journey.length}
               </span>
             </div>
           </div>
@@ -148,17 +148,14 @@ export default function GlobalJourney({ journey }: { journey: JourneyEntry[] }) 
 
 function StatTile({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) {
   return (
-    <div style={{
-      padding: '10px 14px',
-      background: 'rgba(0,255,135,0.06)',
-      border: '1px solid rgba(0,255,135,0.18)',
-      borderRadius: 10,
-      display: 'flex', alignItems: 'center', gap: 8,
-    }}>
+    <div
+      className="flex items-center gap-2 px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-[10px]"
+      style={{ background: 'rgba(0,255,135,0.06)', border: '1px solid rgba(0,255,135,0.18)' }}
+    >
       <span style={{ color: '#00ff87' }}>{icon}</span>
       <div>
-        <div style={{ color: '#fff', fontWeight: 700, fontSize: 16, lineHeight: 1 }}>{value}</div>
-        <div style={{ color: '#888', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>{label}</div>
+        <div className="text-white font-bold text-sm sm:text-base leading-none">{value}</div>
+        <div className="text-[#888] text-[9px] sm:text-[10px] uppercase tracking-[0.1em] mt-0.5">{label}</div>
       </div>
     </div>
   )
@@ -228,11 +225,10 @@ function TimelineList({ entries, onSelect }: {
   }
   const sorted = [...entries].sort((a, b) => b.startDate.localeCompare(a.startDate))
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-      gap: 14,
-    }}>
+    <div
+      className="grid gap-3 sm:gap-4"
+      style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))' }}
+    >
       {sorted.map((e, i) => (
         <motion.button
           key={e.id}

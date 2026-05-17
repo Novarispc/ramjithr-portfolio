@@ -10,13 +10,13 @@ export default function TechConstellation({ skillCategories }: { skillCategories
   if (!skillCategories.length) return null
 
   return (
-    <section id="skills" className="py-24 px-6">
+    <section id="skills" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
           <div className="mb-16">
             <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">04 · Skills</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Tech Constellation</h2>
-            <p className="text-[#a3a3a3] text-lg">The full spectrum of my automotive engineering toolkit.</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4">Tech Constellation</h2>
+            <p className="text-[#a3a3a3] text-base sm:text-lg">The full spectrum of my automotive engineering toolkit.</p>
           </div>
         </ScrollReveal>
 

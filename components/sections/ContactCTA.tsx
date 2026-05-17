@@ -39,7 +39,7 @@ function buildContactOptions(personal: Personal) {
 export default function ContactCTA({ personal }: { personal: Personal }) {
   const CONTACT_OPTIONS = buildContactOptions(personal)
   return (
-    <section id="contact" className="py-24 px-6 bg-[#0d0d0d] relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-[#0d0d0d] relative overflow-hidden">
       {/* Background ambient */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full bg-[#00ff87]/4 blur-[120px]" />
@@ -60,7 +60,7 @@ export default function ContactCTA({ personal }: { personal: Personal }) {
             </span>
           </h2>
 
-          <p className="text-[#a3a3a3] text-lg md:text-xl max-w-2xl mx-auto mb-4 leading-relaxed">
+          <p className="text-[#a3a3a3] text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-4 leading-relaxed">
             Open to senior engineering roles, consultancy, and collaborative projects in automotive software, functional safety, and EV systems.
           </p>
 

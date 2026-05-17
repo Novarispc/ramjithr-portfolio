@@ -8,24 +8,25 @@ interface Metric { value: number; suffix: string; label: string; description: st
 const ICONS = ['⚡', '⏱', '✓', '🎯', '🔍', '🛡']
 
 export default function ImpactDashboard({ metrics }: { metrics: Metric[] }) {
+  if (!metrics?.length) return null
   return (
-    <section id="impact" className="py-24 px-6 bg-[#0d0d0d]">
+    <section id="impact" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-[#0d0d0d]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal>
-          <div className="mb-16">
-            <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-4">03 · Results</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Impact Dashboard</h2>
-            <p className="text-[#a3a3a3] text-lg">Measurable outcomes from 10+ years of engineering precision.</p>
+          <div className="mb-10 sm:mb-14 lg:mb-16">
+            <p className="text-[#00ff87] text-xs tracking-[0.3em] uppercase font-mono mb-3 sm:mb-4">03 · Results</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-4">Impact Dashboard</h2>
+            <p className="text-[#a3a3a3] text-base sm:text-lg">Measurable outcomes from 10+ years of engineering precision.</p>
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {metrics.map((metric, i) => (
             <ScrollReveal key={i} delay={i * 0.08} direction="up">
               <motion.div
                 whileHover={{ y: -6, scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="relative p-6 md:p-8 rounded-2xl bg-[#111] border border-white/6 overflow-hidden group hover:border-[#00ff87]/20 transition-all duration-300"
+                className="relative p-5 sm:p-6 md:p-8 rounded-2xl bg-[#111] border border-white/6 overflow-hidden group hover:border-[#00ff87]/20 transition-all duration-300 h-full"
               >
                 {/* BG glow on hover */}
                 <div className="absolute inset-0 bg-[#00ff87]/0 group-hover:bg-[#00ff87]/3 transition-all duration-500 rounded-2xl" />
@@ -34,13 +35,13 @@ export default function ImpactDashboard({ metrics }: { metrics: Metric[] }) {
                 <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-[#00ff87]/5 blur-2xl group-hover:bg-[#00ff87]/10 transition-all" />
 
                 <div className="relative">
-                  <div className="text-2xl mb-4">{ICONS[i % ICONS.length]}</div>
+                  <div className="text-xl sm:text-2xl mb-3 sm:mb-4">{ICONS[i % ICONS.length]}</div>
 
                   <div className="flex items-end gap-1 mb-2">
-                    <span className="text-4xl md:text-5xl font-black text-white leading-none">
+                    <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-none">
                       <AnimatedCounter value={metric.value} />
                     </span>
-                    <span className="text-2xl font-black text-[#00ff87] pb-1">{metric.suffix}</span>
+                    <span className="text-xl sm:text-2xl font-black text-[#00ff87] pb-1">{metric.suffix}</span>
                   </div>
 
                   <h3 className="text-white font-semibold text-sm md:text-base mb-1">{metric.label}</h3>
@@ -61,14 +62,14 @@ export default function ImpactDashboard({ metrics }: { metrics: Metric[] }) {
 
         {/* Bottom summary bar */}
         <ScrollReveal delay={0.5}>
-          <div className="mt-10 p-6 rounded-2xl bg-[#00ff87]/5 border border-[#00ff87]/15 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-white font-semibold">Driving measurable outcomes across 4 global companies</p>
-              <p className="text-[#a3a3a3] text-sm mt-1">From telematics to EV exterior systems — every metric earned through precision engineering.</p>
+          <div className="mt-10 p-5 sm:p-6 rounded-2xl bg-[#00ff87]/5 border border-[#00ff87]/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-white font-semibold text-sm sm:text-base">Driving measurable outcomes across 4 global companies</p>
+              <p className="text-[#a3a3a3] text-xs sm:text-sm mt-1">From telematics to EV exterior systems — every metric earned through precision engineering.</p>
             </div>
-            <div className="flex items-center gap-2 text-[#00ff87] text-sm font-medium">
+            <div className="flex items-center gap-2 text-[#00ff87] text-xs sm:text-sm font-medium flex-shrink-0">
               <span className="w-2 h-2 rounded-full bg-[#00ff87] animate-pulse" />
-              Volvo Cars · Project Lead · Present
+              <span className="whitespace-nowrap">Volvo · Project Lead · Present</span>
             </div>
           </div>
         </ScrollReveal>

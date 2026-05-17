@@ -58,7 +58,7 @@ export default function SectionShell({
         onDiscard={hasDraft ? handleDiscard : undefined}
         title={title}
       />
-      <main style={{ padding: '24px clamp(16px, 4vw, 32px)', maxWidth: 1100 }}>
+      <main style={{ padding: 'clamp(16px, 3vw, 24px) clamp(12px, 3vw, 32px)', maxWidth: 1100 }}>
         <div className="admin-section-header">
           <div>
             <div className="admin-section-title">{title}</div>

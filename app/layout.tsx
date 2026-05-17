@@ -1,6 +1,14 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/context/ThemeContext'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#080808',
+  colorScheme: 'dark light',
+}
 
 export const metadata: Metadata = {
   title: 'Ramjith Radhakrishnan — Automotive Software & Test Engineer',
