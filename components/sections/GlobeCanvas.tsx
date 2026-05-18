@@ -29,20 +29,6 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     [entries, selectedId],
   )
 
-  // Per-trip arcs: each entry with a defined origin draws its own from → to arc.
-  const arcs = useMemo(() => {
-    return entries
-      .filter(e => typeof e.fromLat === 'number' && typeof e.fromLng === 'number')
-      .map(e => ({
-        startLat: e.fromLat as number,
-        startLng: e.fromLng as number,
-        endLat: e.lat,
-        endLng: e.lng,
-        id: e.id,
-        label: `${e.fromPlace || 'Origin'} → ${e.place}`,
-        highlight: selectedId === e.id,
-      }))
-  }, [entries, selectedId])
 
   // Autorotate, stop on hover
   useEffect(() => {
@@ -127,22 +113,6 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         onPointHover={(d: any) => {
           const controls = globeRef.current?.controls?.()
           if (controls) controls.autoRotate = !d
-        }}
-        arcsData={arcs}
-        arcLabel={(d: any) => `
-          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid rgba(0,255,135,0.4); padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 11px;">
-            ${escapeHtml(d.label)}
-          </div>
-        `}
-        arcColor={(d: any) => d.highlight ? 'rgba(0,255,135,0.95)' : 'rgba(0,255,135,0.45)'}
-        arcStroke={(d: any) => d.highlight ? 0.8 : 0.4}
-        arcAltitudeAutoScale={0.45}
-        arcDashLength={0.4}
-        arcDashGap={0.2}
-        arcDashAnimateTime={(d: any) => d.highlight ? 1800 : 4000}
-        onArcClick={(d: any) => {
-          const target = entries.find(e => e.id === d.id)
-          if (target) onSelect(target)
         }}
         animateIn
       />
