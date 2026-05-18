@@ -260,7 +260,7 @@ export default function GlobeSettingsPage() {
                   />
                 </div>
               </Field>
-              <Field label="Country Borders & Arc Routes" hint="Stroke color for country outlines and flight arc lines.">
+              <Field label="Country Borders" hint="Stroke color for country outline polygons.">
                 <div style={{ marginTop: 8 }}>
                   <ColorPalette
                     labelA="Cool Palette"
@@ -268,11 +268,37 @@ export default function GlobeSettingsPage() {
                     paletteA={ATMOS_PALETTE_A}
                     paletteB={ATMOS_PALETTE_B}
                     value={v.strokeColor}
-                    onChange={hex => ctrl.setValue({ ...v, strokeColor: hex, arcColor: hex })}
+                    onChange={hex => ctrl.setValue({ ...v, strokeColor: hex })}
                   />
                 </div>
               </Field>
             </div>
+          </div>
+
+          {/* ── Route Lines ── */}
+          <div className="admin-card" style={{ padding: 20 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>Route Line Color</div>
+            <div style={{ fontSize: 12, color: 'var(--admin-muted)', marginBottom: 20 }}>
+              Color of the animated arc lines drawn between origin and destination cities.
+            </div>
+            <ColorPalette
+              labelA="Cool Palette"
+              labelB="Warm Palette"
+              paletteA={[
+                { label: 'Mint',   hex: '#00ff87' },
+                { label: 'Cyan',   hex: '#22d3ee' },
+                { label: 'Blue',   hex: '#4488ff' },
+                { label: 'White',  hex: '#ffffff' },
+              ]}
+              paletteB={[
+                { label: 'Purple', hex: '#a855f7' },
+                { label: 'Pink',   hex: '#f472b6' },
+                { label: 'Orange', hex: '#fb923c' },
+                { label: 'Gold',   hex: '#fbbf24' },
+              ]}
+              value={v.arcColor}
+              onChange={hex => ctrl.setValue({ ...v, arcColor: hex })}
+            />
           </div>
 
           {/* ── Live Preview ── */}
@@ -283,7 +309,8 @@ export default function GlobeSettingsPage() {
                 { label: 'Default Pin', color: v.pinColor },
                 { label: 'Selected Pin', color: v.pinSelectedColor },
                 { label: 'Atmosphere', color: v.atmosphereColor },
-                { label: 'Borders / Arcs', color: v.strokeColor },
+                { label: 'Borders', color: v.strokeColor },
+                { label: 'Route Lines', color: v.arcColor },
               ].map(item => (
                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{
