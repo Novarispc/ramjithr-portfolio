@@ -140,9 +140,9 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         atmosphereAltitude={0.18}
         polygonsData={countries}
         polygonAltitude={0.008}
-        polygonCapColor={() => gs.strokeColor + '0a'}
-        polygonSideColor={() => gs.strokeColor + '14'}
-        polygonStrokeColor={() => gs.strokeColor + '8c'}
+        polygonCapColor={() => hexRgba(gs.strokeColor, 0.04)}
+        polygonSideColor={() => hexRgba(gs.strokeColor, 0.08)}
+        polygonStrokeColor={() => hexRgba(gs.strokeColor, 0.55)}
         polygonLabel={() => ''}
         pointsData={points}
         pointLat={(d: any) => d.lat}
@@ -151,7 +151,7 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         pointAltitude={(d: any) => 0.01 + d.size * 0.01}
         pointRadius={(d: any) => 0.18 + d.size * 0.12}
         pointLabel={(d: any) => `
-          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid ${gs.pinColor}66; padding: 8px 12px; border-radius: 8px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.6);">
+          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid ${hexRgba(gs.pinColor, 0.4)}; padding: 8px 12px; border-radius: 8px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.6);">
             <div style="font-weight: 700; font-size: 12px;">${escapeHtml(d.place)}</div>
             <div style="color: #888; font-size: 10px; margin-top: 2px;">${escapeHtml(d.country)}${d.startDate ? ' · ' + escapeHtml(d.startDate.slice(0, 4)) : ''}</div>
           </div>
@@ -163,11 +163,11 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         }}
         arcsData={arcs}
         arcLabel={(d: any) => `
-          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid ${gs.arcColor}66; padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 11px;">
+          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid ${hexRgba(gs.arcColor, 0.4)}; padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 11px;">
             ${escapeHtml(d.label)}
           </div>
         `}
-        arcColor={(d: any) => d.highlight ? gs.arcColor + 'f2' : gs.arcColor + '72'}
+        arcColor={(d: any) => d.highlight ? hexRgba(gs.arcColor, 0.95) : hexRgba(gs.arcColor, 0.45)}
         arcStroke={(d: any) => d.highlight ? 0.8 : 0.4}
         arcAltitudeAutoScale={0.45}
         arcDashLength={0.4}
@@ -187,4 +187,14 @@ function escapeHtml(s: string): string {
   return (s || '').replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]!))
+}
+
+/** Convert a 6-char hex colour + alpha (0–1) → rgba() string for THREE.js/react-globe.gl */
+function hexRgba(hex: string, alpha: number): string {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return `rgba(0,212,170,${alpha})`
+  return `rgba(${r},${g},${b},${alpha})`
 }
