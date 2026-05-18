@@ -6,13 +6,15 @@ import { ALLOWED_TARGETS, type UploadTarget } from './uploads-types'
 export type { UploadTarget } from './uploads-types'
 
 const ALLOWED_MIME: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png':  'png',
-  'image/webp': 'webp',
-  'image/gif':  'gif',
+  'image/jpeg':       'jpg',
+  'image/png':        'png',
+  'image/webp':       'webp',
+  'image/gif':        'gif',
+  'application/pdf':  'pdf',
 }
 
-const MAX_BYTES = 5 * 1024 * 1024 // 5MB
+const MAX_BYTES_IMAGE  = 5  * 1024 * 1024 // 5MB
+const MAX_BYTES_RESUME = 10 * 1024 * 1024 // 10MB
 
 export interface SavedFile {
   id: string
@@ -32,7 +34,8 @@ export async function saveImage(file: File, target: UploadTarget = 'journey'): P
   const mime = (file.type || '').toLowerCase()
   const ext = ALLOWED_MIME[mime]
   if (!ext) throw new UploadError('unsupported_type')
-  if (file.size > MAX_BYTES) throw new UploadError('file_too_large')
+  const maxBytes = target === 'resume' ? MAX_BYTES_RESUME : MAX_BYTES_IMAGE
+  if (file.size > maxBytes) throw new UploadError('file_too_large')
   if (file.size === 0) throw new UploadError('empty_file')
 
   const id = crypto.randomBytes(10).toString('hex')

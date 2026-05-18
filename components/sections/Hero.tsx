@@ -296,15 +296,19 @@ export default function Hero({ personal, stats, rotatingChips }: HeroProps) {
                   View Work
                   <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </a>
-                <a
-                  href="/resume.pdf"
-                  download
-                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl border text-white font-medium text-sm transition-all duration-200 hover:bg-white/8 min-h-[44px]"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
-                >
-                  <FileText size={16} />
-                  Resume
-                </a>
+                {personal.resumeUrl && (
+                  <a
+                    href={personal.resumeUrl}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl border text-white font-medium text-sm transition-all duration-200 hover:bg-white/8 min-h-[44px]"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
+                  >
+                    <FileText size={16} />
+                    Resume
+                  </a>
+                )}
                 <a
                   href="#contact"
                   className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl text-[#a3a3a3] font-medium text-sm hover:text-white transition-colors duration-200 min-h-[44px]"

@@ -66,7 +66,7 @@ export interface UploadedFile {
   mime: string
 }
 
-export type UploadTarget = 'journey' | 'profile' | 'projects'
+export type UploadTarget = 'journey' | 'profile' | 'projects' | 'resume'
 
 export async function uploadImages(files: File[], target: UploadTarget = 'journey'): Promise<UploadedFile[]> {
   const form = new FormData()

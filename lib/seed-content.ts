@@ -12,6 +12,7 @@ export const SEED_CONTENT: ContentSnapshot = {
     github: '',
     currentCompany: 'Volvo Cars Corporation',
     image: '',
+    resumeUrl: '',
   },
   stats: [
     { id: 's1', value: 10, suffix: '+', label: 'Years Experience' },

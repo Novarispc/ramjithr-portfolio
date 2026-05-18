@@ -3,6 +3,7 @@ import { useState } from 'react'
 import SectionShell from '@/components/admin/SectionShell'
 import { Field } from '@/components/admin/Field'
 import SingleImageUploader from '@/components/admin/SingleImageUploader'
+import ResumeUploader from '@/components/admin/ResumeUploader'
 import { useSection } from '@/components/admin/useContent'
 
 export default function PersonalPage() {
@@ -65,6 +66,14 @@ export default function PersonalPage() {
               <input className="admin-input" value={v.github ?? ''} onChange={e => ctrl.setValue({ ...v, github: e.target.value })} />
             </Field>
           </div>
+          <Field label="Resume / CV" hint="Uploaded PDF will appear as a Download Resume button on the portfolio.">
+            <div style={{ marginTop: 6 }}>
+              <ResumeUploader
+                value={v.resumeUrl ?? ''}
+                onChange={url => ctrl.setValue({ ...v, resumeUrl: url })}
+              />
+            </div>
+          </Field>
         </div>
       )}
     </SectionShell>

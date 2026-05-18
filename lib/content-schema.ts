@@ -11,6 +11,7 @@ export const PersonalSchema = z.object({
   github: z.string().url().or(z.literal('')).optional().default(''),
   currentCompany: z.string().max(160).optional().default(''),
   image: z.string().max(500).optional().default(''),
+  resumeUrl: z.string().max(500).optional().default(''),
 })
 
 export const StatSchema = z.object({
