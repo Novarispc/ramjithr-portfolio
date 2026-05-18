@@ -1,7 +1,7 @@
 import 'server-only'
 import { getPublicContent } from './storage'
 import type {
-  ContentSnapshot, AchievementGroup, Language, Timeline, JourneyEntry,
+  ContentSnapshot, AchievementGroup, Language, Timeline, JourneyEntry, GlobeSettings,
 } from './content-schema'
 import {
   IMPACT_METRICS,
@@ -22,6 +22,7 @@ export interface PageData {
   languages: Language[]
   achievements: AchievementGroup[]
   journey: JourneyEntry[]
+  globeSettings: GlobeSettings
   // static (not yet admin-managed)
   rotatingChips: string[]
   impactMetrics: typeof IMPACT_METRICS
@@ -43,6 +44,7 @@ export async function getPageData(): Promise<PageData> {
     languages: snap.languages,
     achievements: snap.achievements,
     journey: snap.journey ?? [],
+    globeSettings: snap.globeSettings,
     rotatingChips: ROTATING_CHIPS,
     impactMetrics: IMPACT_METRICS,
     interests: PERSONAL_INTERESTS,

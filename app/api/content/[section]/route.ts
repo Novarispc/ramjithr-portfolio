@@ -15,6 +15,7 @@ import {
   LanguageSchema,
   AchievementGroupSchema,
   JourneyEntrySchema,
+  GlobeSettingsSchema,
 } from '@/lib/content-schema'
 import { badRequest, handleZod, ok, serverError } from '@/lib/api-utils'
 
@@ -36,6 +37,7 @@ const schemaFor: Record<SectionKey, z.ZodTypeAny> = {
   languages: z.array(LanguageSchema),
   achievements: z.array(AchievementGroupSchema),
   journey: z.array(JourneyEntrySchema),
+  globeSettings: GlobeSettingsSchema,
 }
 
 export async function PUT(

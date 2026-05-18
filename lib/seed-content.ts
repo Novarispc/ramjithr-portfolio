@@ -269,4 +269,12 @@ export const SEED_CONTENT: ContentSnapshot = {
       ],
     },
   ],
+  globeSettings: {
+    globeTexture: 'night',
+    pinColor: '#00d4aa',
+    pinSelectedColor: '#00ff87',
+    atmosphereColor: '#00ff87',
+    strokeColor: '#00ff87',
+    arcColor: '#00ff87',
+  },
 }

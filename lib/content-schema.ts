@@ -131,37 +131,37 @@ export const AchievementGroupSchema = z.object({
   items: z.array(AchievementItemSchema),
 })
 
+export const GlobeTextureEnum = z.enum(['night', 'day', 'blue-marble', 'dark'])
+
+export const GlobeSettingsSchema = z.object({
+  globeTexture: GlobeTextureEnum.default('night'),
+  pinColor: z.string().max(20).default('#00d4aa'),
+  pinSelectedColor: z.string().max(20).default('#00ff87'),
+  atmosphereColor: z.string().max(20).default('#00ff87'),
+  strokeColor: z.string().max(20).default('#00ff87'),
+  arcColor: z.string().max(20).default('#00ff87'),
+})
+
+const ContentSectionSchema = z.object({
+  personal: PersonalSchema,
+  stats: z.array(StatSchema),
+  career: z.array(CareerSchema),
+  timeline: z.array(TimelineSchema),
+  projects: z.array(ProjectSchema),
+  skillCategories: z.array(SkillCategorySchema),
+  education: z.array(EducationSchema),
+  certifications: z.array(CertificationSchema),
+  languages: z.array(LanguageSchema),
+  achievements: z.array(AchievementGroupSchema),
+  journey: z.array(JourneyEntrySchema).default([]),
+  globeSettings: GlobeSettingsSchema.default({}),
+})
+
 export const ContentSchema = z.object({
   version: z.number().int().nonnegative(),
   updatedAt: z.string(),
-  published: z.object({
-    personal: PersonalSchema,
-    stats: z.array(StatSchema),
-    career: z.array(CareerSchema),
-    timeline: z.array(TimelineSchema),
-    projects: z.array(ProjectSchema),
-    skillCategories: z.array(SkillCategorySchema),
-    education: z.array(EducationSchema),
-    certifications: z.array(CertificationSchema),
-    languages: z.array(LanguageSchema),
-    achievements: z.array(AchievementGroupSchema),
-    journey: z.array(JourneyEntrySchema).default([]),
-  }),
-  draft: z
-    .object({
-      personal: PersonalSchema,
-      stats: z.array(StatSchema),
-      career: z.array(CareerSchema),
-      timeline: z.array(TimelineSchema),
-      projects: z.array(ProjectSchema),
-      skillCategories: z.array(SkillCategorySchema),
-      education: z.array(EducationSchema),
-      certifications: z.array(CertificationSchema),
-      languages: z.array(LanguageSchema),
-      achievements: z.array(AchievementGroupSchema),
-      journey: z.array(JourneyEntrySchema).default([]),
-    })
-    .optional(),
+  published: ContentSectionSchema,
+  draft: ContentSectionSchema.optional(),
 })
 
 export type Personal = z.infer<typeof PersonalSchema>
@@ -179,6 +179,8 @@ export type AchievementItem = z.infer<typeof AchievementItemSchema>
 export type AchievementGroup = z.infer<typeof AchievementGroupSchema>
 export type JourneyImage = z.infer<typeof JourneyImageSchema>
 export type JourneyEntry = z.infer<typeof JourneyEntrySchema>
+export type GlobeSettings = z.infer<typeof GlobeSettingsSchema>
+export type GlobeTexture = z.infer<typeof GlobeTextureEnum>
 export type ContentDoc = z.infer<typeof ContentSchema>
 export type ContentSnapshot = ContentDoc['published']
 
@@ -194,6 +196,7 @@ export type SectionKey =
   | 'languages'
   | 'achievements'
   | 'journey'
+  | 'globeSettings'
 
 export const SECTION_KEYS: SectionKey[] = [
   'personal',
@@ -207,4 +210,5 @@ export const SECTION_KEYS: SectionKey[] = [
   'languages',
   'achievements',
   'journey',
+  'globeSettings',
 ]

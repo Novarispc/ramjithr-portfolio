@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   User, Briefcase, Clock, FolderKanban, Sparkles, GraduationCap,
-  Languages, Trophy, Database, ArrowRight, BarChart3, Layers,
+  Languages, Trophy, Database, ArrowRight, BarChart3, Layers, Globe,
 } from 'lucide-react'
 import SectionShell from '@/components/admin/SectionShell'
 import { fetchContent } from '@/lib/admin-client'
@@ -18,6 +18,7 @@ const CARDS = [
   { href: '/admin/education',    label: 'Education',       icon: GraduationCap,  hint: 'Degrees & certs' },
   { href: '/admin/languages',    label: 'Languages',       icon: Languages,      hint: 'Spoken languages' },
   { href: '/admin/achievements', label: 'Achievements',    icon: Trophy,         hint: 'Goal trackers' },
+  { href: '/admin/globe',        label: 'Globe Settings',  icon: Globe,          hint: 'Layout & pin colors' },
   { href: '/admin/backup',       label: 'Backup & History',icon: Database,       hint: 'Export, import, undo' },
 ]
 

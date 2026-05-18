@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Globe2, List, Filter, MapPin, Calendar, Plane, ImageIcon, ArrowRight } from 'lucide-react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import JourneyDetailModal from './JourneyDetailModal'
-import type { JourneyEntry } from '@/lib/content-schema'
+import type { JourneyEntry, GlobeSettings } from '@/lib/content-schema'
 
 const GlobeCanvas = dynamic(() => import('./GlobeCanvas'), {
   ssr: false,
@@ -34,7 +34,7 @@ function useIsMobile(breakpoint = 720) {
   return mobile
 }
 
-export default function GlobalJourney({ journey }: { journey: JourneyEntry[] }) {
+export default function GlobalJourney({ journey, globeSettings }: { journey: JourneyEntry[]; globeSettings?: GlobeSettings }) {
   const [selected, setSelected] = useState<JourneyEntry | null>(null)
   const isMobile = useIsMobile()
   const [view, setView] = useState<ViewMode>('globe')
@@ -134,6 +134,7 @@ export default function GlobalJourney({ journey }: { journey: JourneyEntry[] }) 
               selectedId={selected?.id}
               onSelect={entry => setSelected(entry)}
               height={560}
+              globeSettings={globeSettings}
             />
           ) : (
             <TimelineList entries={filtered} onSelect={entry => setSelected(entry)} />

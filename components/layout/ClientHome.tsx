@@ -36,7 +36,7 @@ export default function ClientHome({ data }: { data: PageData }) {
         <LifeTimeline entries={data.timeline} />
         <SpecialTrackers languages={data.languages} />
         <ImpossibleList achievements={data.achievements} />
-        <GlobalJourney journey={data.journey} />
+        <GlobalJourney journey={data.journey} globeSettings={data.globeSettings} />
         <Education education={data.education} certifications={data.certifications} />
         <PersonalSide interests={data.interests} funFacts={data.funFacts} />
         <ContactCTA personal={data.personal} />
