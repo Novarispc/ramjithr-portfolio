@@ -154,7 +154,14 @@ const ContentSectionSchema = z.object({
   languages: z.array(LanguageSchema),
   achievements: z.array(AchievementGroupSchema),
   journey: z.array(JourneyEntrySchema).default([]),
-  globeSettings: GlobeSettingsSchema.default({}),
+  globeSettings: GlobeSettingsSchema.default(() => ({
+    globeTexture: 'night' as const,
+    pinColor: '#00d4aa',
+    pinSelectedColor: '#00ff87',
+    atmosphereColor: '#00ff87',
+    strokeColor: '#00ff87',
+    arcColor: '#00ff87',
+  })),
 })
 
 export const ContentSchema = z.object({
