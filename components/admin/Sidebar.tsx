@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, User, Briefcase, Clock, FolderKanban, Sparkles,
-  GraduationCap, Languages, Trophy, Database, LogOut, Moon, Sun, X, Globe,
+  GraduationCap, Languages, Trophy, Database, LogOut, Moon, Sun, X, Globe, Settings2,
 } from 'lucide-react'
 import { logout } from '@/lib/admin-client'
 import { useAdminTheme } from './AdminTheme'
@@ -19,6 +19,7 @@ const LINKS = [
   { href: '/admin/languages',      label: 'Languages',      icon: Languages },
   { href: '/admin/achievements',   label: 'Achievements',   icon: Trophy },
   { href: '/admin/journey',        label: 'Global Journey', icon: Globe },
+  { href: '/admin/globe',          label: 'Globe Settings',  icon: Settings2 },
   { href: '/admin/backup',         label: 'Backup & History', icon: Database },
 ]
 
