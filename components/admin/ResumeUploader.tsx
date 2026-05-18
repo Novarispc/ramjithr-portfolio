@@ -24,12 +24,19 @@ export default function ResumeUploader({ value, onChange }: Props) {
     value && !value.startsWith('/api/resume') ? value : '',
   )
 
-  // Load meta when on upload tab
+  // Load meta; if a file exists but value isn't set yet, auto-sync it
   useEffect(() => {
     fetch('/api/resume/meta')
       .then(r => r.json())
-      .then(d => setMeta(d.meta))
+      .then(d => {
+        setMeta(d.meta)
+        // If resume is stored but personalInfo.resumeUrl is not pointing to it, fix it
+        if (d.exists && (!value || value === '')) {
+          onChange('/api/resume')
+        }
+      })
       .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function handleFile(files: FileList | null) {
