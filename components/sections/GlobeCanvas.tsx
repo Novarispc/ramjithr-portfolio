@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
-import * as THREE from 'three'
 import type { JourneyEntry } from '@/lib/content-schema'
 
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false })
@@ -14,19 +13,19 @@ interface Props {
 }
 
 const GLOBE_TEXTURE = 'https://unpkg.com/three-globe/example/img/earth-night.jpg'
-const BG_TEXTURE = 'https://unpkg.com/three-globe/example/img/night-sky.png'
+const BG_TEXTURE   = 'https://unpkg.com/three-globe/example/img/night-sky.png'
 const COUNTRIES_URL = 'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson'
 
-// Spherical linear interpolation between two lat/lng points along great circle
+// Great-circle spherical lerp
 function slerpLatLng(
   lat1: number, lng1: number,
   lat2: number, lng2: number,
   t: number,
 ): { lat: number; lng: number } {
-  const toRad = (d: number) => d * Math.PI / 180
-  const toDeg = (r: number) => r * 180 / Math.PI
-  const φ1 = toRad(lat1), λ1 = toRad(lng1)
-  const φ2 = toRad(lat2), λ2 = toRad(lng2)
+  const R = Math.PI / 180
+  const D = 180 / Math.PI
+  const φ1 = lat1 * R, λ1 = lng1 * R
+  const φ2 = lat2 * R, λ2 = lng2 * R
   const d = 2 * Math.asin(Math.sqrt(
     Math.sin((φ2 - φ1) / 2) ** 2 +
     Math.cos(φ1) * Math.cos(φ2) * Math.sin((λ2 - λ1) / 2) ** 2,
@@ -37,119 +36,34 @@ function slerpLatLng(
   const x = A * Math.cos(φ1) * Math.cos(λ1) + B * Math.cos(φ2) * Math.cos(λ2)
   const y = A * Math.cos(φ1) * Math.sin(λ1) + B * Math.cos(φ2) * Math.sin(λ2)
   const z = A * Math.sin(φ1) + B * Math.sin(φ2)
-  return {
-    lat: toDeg(Math.atan2(z, Math.sqrt(x * x + y * y))),
-    lng: toDeg(Math.atan2(y, x)),
-  }
+  return { lat: Math.atan2(z, Math.sqrt(x * x + y * y)) * D, lng: Math.atan2(y, x) * D }
 }
 
-function escapeHtml(s: string): string {
+function esc(s: string): string {
   return (s || '').replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!),
   )
 }
 
-// Inject global CSS once for pin animations and tooltip
-let cssReady = false
-function injectPinCss() {
-  if (cssReady || typeof document === 'undefined') return
-  cssReady = true
-  const s = document.createElement('style')
-  s.textContent = `
-    @keyframes gpin-pulse {
-      0%   { transform: scale(1);   opacity: 0.8; }
-      100% { transform: scale(4.2); opacity: 0;   }
-    }
-    .gpin-ring-a { animation: gpin-pulse 2.4s ease-out infinite; }
-    .gpin-ring-b { animation: gpin-pulse 2.4s ease-out infinite; animation-delay: 1.0s; }
-    .gpin-tip {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-6px);
-      transition: opacity 0.14s ease, transform 0.14s ease;
-      pointer-events: none;
-    }
-    .gpin-wrap:hover .gpin-tip {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .gpin-dot { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-    .gpin-wrap:hover .gpin-dot { transform: scale(1.25); }
-  `
-  document.head.appendChild(s)
-}
-
-function buildPlaneTexture(): THREE.CanvasTexture {
-  const sz = 72
-  const cv = document.createElement('canvas')
-  cv.width = sz; cv.height = sz
-  const ctx = cv.getContext('2d')!
-  // soft halo
-  const grd = ctx.createRadialGradient(sz / 2, sz / 2, 3, sz / 2, sz / 2, 26)
-  grd.addColorStop(0, 'rgba(255,255,255,0.22)')
-  grd.addColorStop(1, 'rgba(255,255,255,0)')
-  ctx.fillStyle = grd
-  ctx.beginPath()
-  ctx.arc(sz / 2, sz / 2, 26, 0, Math.PI * 2)
-  ctx.fill()
-  // airplane glyph
-  ctx.font = '30px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillStyle = 'rgba(255,255,255,0.96)'
-  ctx.fillText('✈', sz / 2, sz / 2)
-  return new THREE.CanvasTexture(cv)
-}
-
-function makePinEl(
-  e: JourneyEntry,
-  selected: boolean,
-  onClick: () => void,
-  onHover: (v: boolean) => void,
-): HTMLElement {
-  injectPinCss()
-  const sz = selected ? 13 : 8
-  const col = selected ? '#ff2020' : '#ff4444'
-  const glow = selected
-    ? `0 0 10px ${col}, 0 0 22px ${col}66`
-    : `0 0 6px ${col}, 0 0 14px ${col}44`
-
-  const wrap = document.createElement('div')
-  wrap.className = 'gpin-wrap'
-  wrap.style.cssText = 'position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;'
-
-  wrap.innerHTML = `
-    <div style="position:relative;width:${sz}px;height:${sz}px;">
-      <div class="gpin-ring-a" style="position:absolute;inset:-3px;border-radius:50%;border:1px solid ${col};opacity:0;"></div>
-      <div class="gpin-ring-b" style="position:absolute;inset:-3px;border-radius:50%;border:1px solid ${col};opacity:0;"></div>
-      <div class="gpin-dot" style="width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle at 36% 36%,#ff6666,${col});box-shadow:${glow};border:1.5px solid rgba(255,255,255,${selected ? 0.8 : 0.5});"></div>
-    </div>
-    <div class="gpin-tip" style="position:absolute;bottom:calc(100% + 10px);left:50%;z-index:200;">
-      <div style="background:rgba(6,6,8,0.97);border:1px solid rgba(255,70,70,0.4);padding:7px 12px;border-radius:9px;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,0.75);">
-        <div style="font-family:Inter,sans-serif;font-weight:700;font-size:12px;color:#fff;">${escapeHtml(e.place)}</div>
-        <div style="font-family:Inter,sans-serif;font-size:10px;color:#888;margin-top:2px;">${escapeHtml(e.country)}${e.startDate ? ' · ' + escapeHtml(e.startDate.slice(0, 4)) : ''}</div>
-      </div>
-    </div>
-  `
-
-  wrap.addEventListener('click', ev => { ev.stopPropagation(); onClick() })
-  wrap.addEventListener('mouseenter', () => onHover(true))
-  wrap.addEventListener('mouseleave', () => onHover(false))
-  return wrap
-}
+type Tip = { x: number; y: number; entry: JourneyEntry } | null
 
 export default function GlobeCanvas({ entries, selectedId, onSelect, height = 540 }: Props) {
-  const globeRef = useRef<any>(null)
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const sizeRef = useRef({ w: 0, h: height })
-  const controlsRef = useRef<any>(null)
+  const globeRef   = useRef<any>(null)
+  const wrapRef    = useRef<HTMLDivElement>(null)
+  const trailRef   = useRef<HTMLCanvasElement>(null)
+  const sizeRef    = useRef({ w: 0, h: height })
+  const ctrlRef    = useRef<any>(null)
+  const mouseRef   = useRef({ x: 0, y: 0 })
+
   const [countries, setCountries] = useState<any[]>([])
+  const [tip, setTip] = useState<Tip>(null)
 
-  // Airplane animation — all via refs, zero React state updates per frame
-  const planeT = useRef<Map<string, number>>(new Map())
-  const planeSprites = useRef<Map<string, THREE.Sprite>>(new Map())
-  const planeScene = useRef<THREE.Scene | null>(null)
-  const rafId = useRef<number>(0)
+  // Airplane state — all refs, zero React re-renders per frame
+  const planeEls   = useRef<Map<string, HTMLDivElement>>(new Map())
+  const planeT     = useRef<Map<string, number>>(new Map())
+  const rafId      = useRef<number>(0)
 
+  // ── Country borders ─────────────────────────────────────────────
   useEffect(() => {
     fetch(COUNTRIES_URL)
       .then(r => r.json())
@@ -157,7 +71,8 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
       .catch(() => {})
   }, [])
 
-  const htmlPoints = useMemo(
+  // ── Derived data ─────────────────────────────────────────────────
+  const points = useMemo(
     () => entries.map(e => ({ ...e, __sel: selectedId === e.id })),
     [entries, selectedId],
   )
@@ -166,10 +81,8 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     entries
       .filter(e => typeof e.fromLat === 'number' && typeof e.fromLng === 'number')
       .map(e => ({
-        startLat: e.fromLat as number,
-        startLng: e.fromLng as number,
-        endLat: e.lat,
-        endLng: e.lng,
+        startLat: e.fromLat as number, startLng: e.fromLng as number,
+        endLat: e.lat,                 endLng: e.lng,
         id: e.id,
         label: `${e.fromPlace || 'Origin'} → ${e.place}`,
         highlight: selectedId === e.id,
@@ -177,33 +90,33 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     [entries, selectedId],
   )
 
-  // Globe init — autorotate + initial view
+  // ── Globe controls init ──────────────────────────────────────────
   useEffect(() => {
     const g = globeRef.current
     if (!g) return
     const c = g.controls?.()
-    controlsRef.current = c
+    ctrlRef.current = c
     if (c) {
-      c.autoRotate = true
-      c.autoRotateSpeed = 0.45
-      c.enableZoom = true
-      c.enableDamping = true
-      c.dampingFactor = 0.08
+      c.autoRotate      = true
+      c.autoRotateSpeed = 0.4
+      c.enableZoom      = true
+      c.enableDamping   = true
+      c.dampingFactor   = 0.08
     }
     g.pointOfView?.({ lat: 30, lng: 30, altitude: 2.2 }, 0)
   }, [])
 
-  // Zoom to selected city
+  // ── Zoom to selected city ────────────────────────────────────────
   useEffect(() => {
     const g = globeRef.current
     if (!g || !selectedId) return
-    const target = entries.find(e => e.id === selectedId)
-    if (!target) return
-    g.pointOfView?.({ lat: target.lat, lng: target.lng, altitude: 0.5 }, 1200)
-    if (controlsRef.current) controlsRef.current.autoRotate = false
+    const t = entries.find(e => e.id === selectedId)
+    if (!t) return
+    g.pointOfView?.({ lat: t.lat, lng: t.lng, altitude: 0.5 }, 1200)
+    if (ctrlRef.current) ctrlRef.current.autoRotate = false
   }, [selectedId, entries])
 
-  // Resize observer
+  // ── Resize observer ──────────────────────────────────────────────
   useEffect(() => {
     const el = wrapRef.current
     if (!el) return
@@ -211,6 +124,11 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
       const rect = el.getBoundingClientRect()
       sizeRef.current = { w: rect.width, h: height }
       globeRef.current?._setSize?.(rect.width, height)
+      const cv = trailRef.current
+      if (cv) {
+        cv.width  = Math.round(rect.width  * (window.devicePixelRatio || 1))
+        cv.height = Math.round(height      * (window.devicePixelRatio || 1))
+      }
     }
     measure()
     const obs = new ResizeObserver(measure)
@@ -218,113 +136,180 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     return () => obs.disconnect()
   }, [height])
 
-  // Airplane animation — THREE sprites, RAF loop, no React re-renders
+  // ── Airplane DOM + canvas trail animation ────────────────────────
   useEffect(() => {
-    const validArcs = entries.filter(
+    const container = wrapRef.current
+    if (!container) return
+
+    const flights = entries.filter(
       e => typeof e.fromLat === 'number' && typeof e.fromLng === 'number',
     )
 
-    // Clear previous sprites
-    if (planeScene.current) {
-      planeSprites.current.forEach(s => planeScene.current!.remove(s))
-    }
-    planeSprites.current.clear()
-    if (rafId.current) cancelAnimationFrame(rafId.current)
+    // cleanup old
+    planeEls.current.forEach(el => el.remove())
+    planeEls.current.clear()
+    cancelAnimationFrame(rafId.current)
 
-    if (!validArcs.length) return
+    if (!flights.length) return
 
-    let initialized = false
-    let texture: THREE.CanvasTexture | null = null
-    const SPEED = 0.000065 // completes arc in ~15 s
-    let last = performance.now()
-
-    const tryInit = (): boolean => {
-      const g = globeRef.current
-      if (!g) return false
-      const scene: THREE.Scene | null = g.scene?.()
-      if (!scene) return false
-      planeScene.current = scene
-      texture = buildPlaneTexture()
-
-      validArcs.forEach((e, i) => {
-        const mat = new THREE.SpriteMaterial({
-          map: texture!,
-          transparent: true,
-          opacity: 0.92,
-          depthWrite: false,
-          depthTest: false,
-        })
-        const sprite = new THREE.Sprite(mat)
-        sprite.scale.set(4, 4, 1)
-        sprite.visible = false
-        sprite.renderOrder = 999
-        scene.add(sprite)
-        planeSprites.current.set(e.id, sprite)
-        if (!planeT.current.has(e.id)) {
-          planeT.current.set(e.id, i / Math.max(validArcs.length, 1))
-        }
+    // Build one tiny div per flight
+    flights.forEach((e, i) => {
+      const el = document.createElement('div')
+      // Airplane SVG path — always crisp, no emoji rendering dependency
+      el.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 7L2 2L4.5 7L2 12L13 7Z" fill="rgba(255,255,255,0.95)"/>
+        </svg>
+      `
+      Object.assign(el.style, {
+        position:     'absolute',
+        pointerEvents:'none',
+        zIndex:       '20',
+        width:        '14px',
+        height:       '14px',
+        transform:    'translate(-50%, -50%)',
+        opacity:      '0',
+        willChange:   'left, top, transform',
+        filter:       'drop-shadow(0 0 4px rgba(255,255,255,0.8)) drop-shadow(0 0 8px rgba(255,255,255,0.4))',
       })
-      return true
-    }
+      container.appendChild(el)
+      planeEls.current.set(e.id, el)
+      if (!planeT.current.has(e.id)) {
+        planeT.current.set(e.id, i / Math.max(flights.length, 1))
+      }
+    })
+
+    const SPEED = 0.000065  // full arc ≈ 15 s
+    const dpr   = window.devicePixelRatio || 1
+    let last    = performance.now()
 
     const tick = (now: number) => {
-      if (!initialized) initialized = tryInit()
+      const dt = Math.min(now - last, 80)
+      last = now
+      const g  = globeRef.current
+      const cv = trailRef.current
+      const ctx = cv?.getContext('2d') ?? null
 
-      const g = globeRef.current
-      if (initialized && g) {
-        const dt = Math.min(now - last, 80)
-        last = now
-        validArcs.forEach(e => {
-          const sprite = planeSprites.current.get(e.id)
-          if (!sprite) return
-          let t = (planeT.current.get(e.id) ?? 0) + SPEED * dt
-          if (t >= 1) t -= 1
-          planeT.current.set(e.id, t)
-          const pos = slerpLatLng(e.fromLat!, e.fromLng!, e.lat, e.lng, t)
-          const coords = g.getCoords?.(pos.lat, pos.lng, 0.025)
-          if (coords) {
-            sprite.position.set(coords.x, coords.y, coords.z)
-            sprite.visible = true
-          }
-        })
-      } else {
-        last = now
+      // Fade existing trail each frame (destination-out = reduce alpha)
+      if (ctx && cv) {
+        ctx.globalCompositeOperation = 'destination-out'
+        ctx.globalAlpha = 0.045
+        ctx.fillRect(0, 0, cv.width, cv.height)
+        ctx.globalCompositeOperation = 'source-over'
+        ctx.globalAlpha = 1
       }
+
+      if (!g) { rafId.current = requestAnimationFrame(tick); return }
+
+      flights.forEach(e => {
+        const el = planeEls.current.get(e.id)
+        if (!el) return
+
+        let t = (planeT.current.get(e.id) ?? 0) + SPEED * dt
+        if (t >= 1) t -= 1
+        planeT.current.set(e.id, t)
+
+        const pos = slerpLatLng(e.fromLat!, e.fromLng!, e.lat, e.lng, t)
+        const sc  = g.getScreenCoords?.(pos.lat, pos.lng, 0.022) as { x: number; y: number } | null
+        if (!sc) { el.style.opacity = '0'; return }
+
+        // Hide when on the back of the globe
+        const c3  = g.getCoords?.(pos.lat, pos.lng, 0)
+        const cam = g.camera?.()
+        if (c3 && cam) {
+          const dot = c3.x * cam.position.x + c3.y * cam.position.y + c3.z * cam.position.z
+          if (dot <= 0) { el.style.opacity = '0'; return }
+        }
+
+        // Bearing: look a tiny step ahead
+        const tFwd = Math.min(t + 0.008, 0.999)
+        const pFwd = slerpLatLng(e.fromLat!, e.fromLng!, e.lat, e.lng, tFwd)
+        const scFwd = g.getScreenCoords?.(pFwd.lat, pFwd.lng, 0.022) as { x: number; y: number } | null
+        let angle = 0
+        if (scFwd) {
+          angle = Math.atan2(scFwd.y - sc.y, scFwd.x - sc.x) * 180 / Math.PI
+        }
+
+        el.style.left      = `${sc.x}px`
+        el.style.top       = `${sc.y}px`
+        el.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`
+        el.style.opacity   = '1'
+
+        // Draw trail dot on canvas at current position
+        if (ctx && cv) {
+          const px = sc.x * dpr
+          const py = sc.y * dpr
+          const r  = 2.2 * dpr
+          const g2 = ctx.createRadialGradient(px, py, 0, px, py, r)
+          g2.addColorStop(0, 'rgba(255,255,255,0.55)')
+          g2.addColorStop(1, 'rgba(255,255,255,0)')
+          ctx.fillStyle = g2
+          ctx.beginPath()
+          ctx.arc(px, py, r, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      })
+
       rafId.current = requestAnimationFrame(tick)
     }
 
     rafId.current = requestAnimationFrame(tick)
 
     return () => {
-      if (rafId.current) cancelAnimationFrame(rafId.current)
-      const scene = planeScene.current ?? globeRef.current?.scene?.()
-      planeSprites.current.forEach(s => {
-        scene?.remove(s)
-        s.material.dispose()
-      })
-      planeSprites.current.clear()
-      texture?.dispose()
+      cancelAnimationFrame(rafId.current)
+      planeEls.current.forEach(el => el.remove())
+      planeEls.current.clear()
     }
   }, [entries])
 
   return (
     <div
       ref={wrapRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height,
-        cursor: 'grab',
-        borderRadius: 18,
-        overflow: 'hidden',
-        background: '#000',
+      style={{ position: 'relative', width: '100%', height, cursor: 'grab', borderRadius: 18, overflow: 'hidden', background: '#000' }}
+      onMouseDown={e  => (e.currentTarget.style.cursor = 'grabbing')}
+      onMouseUp={e    => (e.currentTarget.style.cursor = 'grab')}
+      onMouseMove={e  => {
+        const r = wrapRef.current?.getBoundingClientRect()
+        if (r) mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top }
       }}
-      onMouseDown={e => (e.currentTarget.style.cursor = 'grabbing')}
-      onMouseUp={e => (e.currentTarget.style.cursor = 'grab')}
       onMouseLeave={() => {
-        if (controlsRef.current && !selectedId) controlsRef.current.autoRotate = true
+        if (ctrlRef.current && !selectedId) ctrlRef.current.autoRotate = true
+        setTip(null)
       }}
     >
+      {/* Trail canvas — sits above WebGL, below plane divs */}
+      <canvas
+        ref={trailRef}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 15 }}
+      />
+
+      {/* Tooltip */}
+      {tip && (
+        <div style={{
+          position: 'absolute',
+          left: tip.x,
+          top:  tip.y - 54,
+          transform: 'translateX(-50%)',
+          zIndex: 100,
+          pointerEvents: 'none',
+          background: 'rgba(6,6,8,0.97)',
+          border: '1px solid rgba(255,60,60,0.45)',
+          padding: '7px 13px',
+          borderRadius: 9,
+          whiteSpace: 'nowrap',
+          boxShadow: '0 6px 22px rgba(0,0,0,0.8)',
+          fontFamily: 'Inter, sans-serif',
+        }}>
+          <div style={{ fontWeight: 700, fontSize: 12, color: '#fff', letterSpacing: '0.01em' }}>
+            {tip.entry.place}
+          </div>
+          <div style={{ fontSize: 10, color: '#777', marginTop: 2 }}>
+            {tip.entry.country}
+            {tip.entry.startDate ? ` · ${tip.entry.startDate.slice(0, 4)}` : ''}
+          </div>
+        </div>
+      )}
+
       <Globe
         ref={globeRef}
         width={sizeRef.current.w || undefined}
@@ -335,43 +320,60 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         showAtmosphere
         atmosphereColor="#00ff87"
         atmosphereAltitude={0.18}
+
+        // Country borders
         polygonsData={countries}
         polygonAltitude={0.008}
         polygonCapColor={() => 'rgba(0,255,135,0.04)'}
         polygonSideColor={() => 'rgba(0,255,135,0.08)'}
         polygonStrokeColor={() => 'rgba(0,255,135,0.55)'}
         polygonLabel={() => ''}
-        htmlElementsData={htmlPoints}
-        htmlLat={(d: any) => d.lat}
-        htmlLng={(d: any) => d.lng}
-        htmlAltitude={0.025}
-        htmlTransitionDuration={0}
-        htmlElement={(d: any) =>
-          makePinEl(
-            d as JourneyEntry,
-            d.__sel,
-            () => onSelect(d as JourneyEntry),
-            (hovered: boolean) => {
-              if (controlsRef.current) controlsRef.current.autoRotate = !hovered
-            },
-          )
-        }
+
+        // Red minimalist pins
+        pointsData={points}
+        pointLat={(d: any) => d.lat}
+        pointLng={(d: any) => d.lng}
+        pointColor={(d: any) => d.__sel ? '#ff1f1f' : '#ff4444'}
+        pointRadius={(d: any) => d.__sel ? 0.52 : 0.3}
+        pointAltitude={0.014}
+        pointLabel={() => ''}
+        onPointClick={(d: any) => onSelect(d as JourneyEntry)}
+        onPointHover={(d: any) => {
+          if (d) {
+            setTip({ x: mouseRef.current.x, y: mouseRef.current.y, entry: d as JourneyEntry })
+          } else {
+            setTip(null)
+          }
+          if (ctrlRef.current) ctrlRef.current.autoRotate = !d
+        }}
+
+        // Expanding pulse rings at each pin
+        ringsData={entries}
+        ringLat={(d: any) => d.lat}
+        ringLng={(d: any) => d.lng}
+        ringColor={() => (t: number) => `rgba(255,55,55,${(1 - t) * 0.65})`}
+        ringMaxRadius={3.8}
+        ringPropagationSpeed={3.2}
+        ringRepeatPeriod={2400}
+
+        // Thin glowing route arcs
         arcsData={arcs}
         arcLabel={(d: any) => `
-          <div style="font-family:Inter,sans-serif;background:rgba(6,6,8,0.97);border:1px solid rgba(255,70,70,0.4);padding:6px 11px;border-radius:7px;color:#fff;font-size:11px;">
-            ${escapeHtml(d.label)}
+          <div style="font-family:Inter,sans-serif;background:rgba(6,6,8,0.97);border:1px solid rgba(255,60,60,0.4);padding:6px 11px;border-radius:7px;color:#fff;font-size:11px;">
+            ${esc(d.label)}
           </div>
         `}
-        arcColor={(d: any) => d.highlight ? 'rgba(255,160,160,0.92)' : 'rgba(255,90,90,0.28)'}
-        arcStroke={(d: any) => d.highlight ? 0.7 : 0.28}
+        arcColor={(d: any) => d.highlight ? 'rgba(255,190,190,0.9)' : 'rgba(255,90,90,0.2)'}
+        arcStroke={(d: any) => d.highlight ? 0.6 : 0.2}
         arcAltitudeAutoScale={0.45}
-        arcDashLength={0.32}
-        arcDashGap={0.14}
-        arcDashAnimateTime={(d: any) => d.highlight ? 1500 : 3200}
+        arcDashLength={0.3}
+        arcDashGap={0.1}
+        arcDashAnimateTime={(d: any) => d.highlight ? 1400 : 2800}
         onArcClick={(d: any) => {
           const target = entries.find(e => e.id === d.id)
           if (target) onSelect(target)
         }}
+
         animateIn
       />
     </div>
