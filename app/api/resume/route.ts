@@ -17,7 +17,7 @@ export async function GET() {
     }
     const { buffer, meta } = result
     const filename = encodeURIComponent(meta.filename || 'resume.pdf')
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
