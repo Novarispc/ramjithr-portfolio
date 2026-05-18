@@ -5,7 +5,15 @@ import ScrollReveal from '@/components/ui/ScrollReveal'
 import type { Personal } from '@/lib/content-schema'
 
 function buildContactOptions(personal: Personal) {
-  return [
+  const options: {
+    icon: typeof Mail
+    label: string
+    description: string
+    href: string
+    color: string
+    action: string
+    download: boolean
+  }[] = [
     {
       icon: Mail,
       label: 'Send an Email',
@@ -24,16 +32,20 @@ function buildContactOptions(personal: Personal) {
       action: 'Open Profile',
       download: false,
     },
-    {
+  ]
+  if (personal.resumeUrl) {
+    options.push({
       icon: FileText,
       label: 'Download Resume',
       description: 'Full CV with complete experience timeline',
-      href: '/resume.pdf',
+      href: personal.resumeUrl,
       color: '#c9a84c',
       action: 'Get Resume',
-      download: true,
-    },
-  ]
+      // download attribute only works same-origin (i.e. /api/resume)
+      download: personal.resumeUrl.startsWith('/api/resume'),
+    })
+  }
+  return options
 }
 
 export default function ContactCTA({ personal }: { personal: Personal }) {
