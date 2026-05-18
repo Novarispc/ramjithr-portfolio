@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import type { JourneyEntry } from '@/lib/content-schema'
 
@@ -14,11 +14,20 @@ interface Props {
 
 const GLOBE_TEXTURE = 'https://unpkg.com/three-globe/example/img/earth-night.jpg'
 const BG_TEXTURE = 'https://unpkg.com/three-globe/example/img/night-sky.png'
+const COUNTRIES_URL = 'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson'
 
 export default function GlobeCanvas({ entries, selectedId, onSelect, height = 540 }: Props) {
   const globeRef = useRef<any>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const sizeRef = useRef({ w: 0, h: height })
+  const [countries, setCountries] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch(COUNTRIES_URL)
+      .then(r => r.json())
+      .then(data => setCountries(data.features ?? []))
+      .catch(() => {})
+  }, [])
 
   const points = useMemo(
     () => entries.map(e => ({
@@ -29,8 +38,20 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     [entries, selectedId],
   )
 
+  const arcs = useMemo(() => {
+    return entries
+      .filter(e => typeof e.fromLat === 'number' && typeof e.fromLng === 'number')
+      .map(e => ({
+        startLat: e.fromLat as number,
+        startLng: e.fromLng as number,
+        endLat: e.lat,
+        endLng: e.lng,
+        id: e.id,
+        label: `${e.fromPlace || 'Origin'} → ${e.place}`,
+        highlight: selectedId === e.id,
+      }))
+  }, [entries, selectedId])
 
-  // Autorotate, stop on hover
   useEffect(() => {
     const g = globeRef.current
     if (!g) return
@@ -45,7 +66,6 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     g.pointOfView?.({ lat: 30, lng: 30, altitude: 2.2 }, 0)
   }, [])
 
-  // Zoom to selected
   useEffect(() => {
     const g = globeRef.current
     if (!g || !selectedId) return
@@ -56,7 +76,6 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
     if (controls) controls.autoRotate = false
   }, [selectedId, entries])
 
-  // Resize observer
   useEffect(() => {
     const el = wrapRef.current
     if (!el) return
@@ -97,6 +116,12 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         showAtmosphere
         atmosphereColor="#00ff87"
         atmosphereAltitude={0.18}
+        polygonsData={countries}
+        polygonAltitude={0.008}
+        polygonCapColor={() => 'rgba(0,255,135,0.04)'}
+        polygonSideColor={() => 'rgba(0,255,135,0.08)'}
+        polygonStrokeColor={() => 'rgba(0,255,135,0.55)'}
+        polygonLabel={() => ''}
         pointsData={points}
         pointLat={(d: any) => d.lat}
         pointLng={(d: any) => d.lng}
@@ -113,6 +138,22 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         onPointHover={(d: any) => {
           const controls = globeRef.current?.controls?.()
           if (controls) controls.autoRotate = !d
+        }}
+        arcsData={arcs}
+        arcLabel={(d: any) => `
+          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid rgba(0,255,135,0.4); padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 11px;">
+            ${escapeHtml(d.label)}
+          </div>
+        `}
+        arcColor={(d: any) => d.highlight ? 'rgba(0,255,135,0.95)' : 'rgba(0,255,135,0.45)'}
+        arcStroke={(d: any) => d.highlight ? 0.8 : 0.4}
+        arcAltitudeAutoScale={0.45}
+        arcDashLength={0.4}
+        arcDashGap={0.2}
+        arcDashAnimateTime={(d: any) => d.highlight ? 1800 : 4000}
+        onArcClick={(d: any) => {
+          const target = entries.find(e => e.id === d.id)
+          if (target) onSelect(target)
         }}
         animateIn
       />
