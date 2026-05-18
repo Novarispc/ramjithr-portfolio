@@ -5,6 +5,89 @@ import type { JourneyEntry } from '@/lib/content-schema'
 
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false })
 
+/* ── Teardrop pin SVG ──────────────────────────────────────────────────────── */
+function makePinEl(
+  entry: JourneyEntry & { size: number; color: string; selected: boolean },
+  onClick: () => void,
+): HTMLElement {
+  const wrap = document.createElement('div')
+  wrap.style.cssText = [
+    'position:relative',
+    'display:flex',
+    'flex-direction:column',
+    'align-items:center',
+    'cursor:pointer',
+    'user-select:none',
+    'transform-origin:bottom center',
+    `transform:scale(${entry.selected ? 1.35 : 1})`,
+    'transition:transform 0.25s ease',
+    'filter:drop-shadow(0 2px 6px rgba(0,0,0,0.55))',
+  ].join(';')
+
+  const pinColor = entry.selected ? '#ff4d4d' : '#ff6b35'
+  const innerColor = entry.selected ? '#fff' : 'rgba(255,255,255,0.85)'
+
+  // Teardrop SVG (same proportions as classic map pin)
+  wrap.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">
+      <defs>
+        <radialGradient id="pg_${entry.id}" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#ff9a6c"/>
+          <stop offset="100%" stop-color="${pinColor}"/>
+        </radialGradient>
+      </defs>
+      <!-- Pin body -->
+      <path d="M14 0 C6.268 0 0 6.268 0 14 C0 22 14 38 14 38 C14 38 28 22 28 14 C28 6.268 21.732 0 14 0 Z"
+            fill="url(#pg_${entry.id})" stroke="rgba(255,255,255,0.35)" stroke-width="0.8"/>
+      <!-- Inner circle -->
+      <circle cx="14" cy="14" r="7" fill="${innerColor}" opacity="0.9"/>
+      <!-- Tiny dot centre -->
+      <circle cx="14" cy="14" r="2.5" fill="${pinColor}"/>
+    </svg>
+    ${entry.selected ? `
+    <div style="
+      position:absolute;
+      bottom:-5px;
+      width:10px;height:10px;
+      border-radius:50%;
+      background:${pinColor};
+      opacity:0.35;
+      animation:pin-pulse 1.4s ease-out infinite;
+    "></div>` : ''}
+  `
+
+  // Tooltip
+  const tip = document.createElement('div')
+  tip.style.cssText = [
+    'position:absolute',
+    'bottom:42px',
+    'left:50%',
+    'transform:translateX(-50%)',
+    'background:rgba(10,10,12,0.95)',
+    'border:1px solid rgba(255,107,53,0.5)',
+    'padding:6px 10px',
+    'border-radius:8px',
+    'white-space:nowrap',
+    'pointer-events:none',
+    'opacity:0',
+    'transition:opacity 0.18s',
+    'z-index:10',
+  ].join(';')
+  tip.innerHTML = `
+    <div style="font-family:Inter,sans-serif;font-weight:700;font-size:12px;color:#fff">${escapeHtml(entry.place)}</div>
+    <div style="font-family:Inter,sans-serif;font-size:10px;color:#aaa;margin-top:2px">
+      ${escapeHtml(entry.country)}${entry.startDate ? ' · ' + escapeHtml(entry.startDate.slice(0, 4)) : ''}
+    </div>
+  `
+  wrap.appendChild(tip)
+
+  wrap.addEventListener('mouseenter', () => { tip.style.opacity = '1' })
+  wrap.addEventListener('mouseleave', () => { tip.style.opacity = '0' })
+  wrap.addEventListener('click', onClick)
+
+  return wrap
+}
+
 interface Props {
   entries: JourneyEntry[]
   selectedId?: string | null
@@ -29,13 +112,24 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
       .catch(() => {})
   }, [])
 
-  const points = useMemo(
+  const enrichedEntries = useMemo(
     () => entries.map(e => ({
       ...e,
       size: selectedId === e.id ? 1.4 : 0.6,
-      color: selectedId === e.id ? '#00ff87' : '#00d4aa',
+      color: selectedId === e.id ? '#ff4d4d' : '#ff6b35',
+      selected: selectedId === e.id,
     })),
     [entries, selectedId],
+  )
+
+  const htmlElements = useMemo(
+    () => enrichedEntries.map(e => ({
+      lat: e.lat,
+      lng: e.lng,
+      altitude: e.selected ? 0.025 : 0.01,
+      entry: e,
+    })),
+    [enrichedEntries],
   )
 
   // Per-trip arcs: each entry with a defined origin draws its own from → to arc.
@@ -110,6 +204,13 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
       onMouseDown={e => (e.currentTarget.style.cursor = 'grabbing')}
       onMouseUp={e => (e.currentTarget.style.cursor = 'grab')}
     >
+      <style>{`
+        @keyframes pin-pulse {
+          0%   { transform: scale(1);   opacity: 0.35; }
+          70%  { transform: scale(2.8); opacity: 0; }
+          100% { transform: scale(2.8); opacity: 0; }
+        }
+      `}</style>
       <Globe
         ref={globeRef}
         width={sizeRef.current.w || undefined}
@@ -126,23 +227,11 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
         polygonSideColor={() => 'rgba(0,255,135,0.08)'}
         polygonStrokeColor={() => 'rgba(0,255,135,0.55)'}
         polygonLabel={() => ''}
-        pointsData={points}
-        pointLat={(d: any) => d.lat}
-        pointLng={(d: any) => d.lng}
-        pointColor={(d: any) => d.color}
-        pointAltitude={(d: any) => 0.01 + d.size * 0.01}
-        pointRadius={(d: any) => 0.18 + d.size * 0.12}
-        pointLabel={(d: any) => `
-          <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid rgba(0,255,135,0.4); padding: 8px 12px; border-radius: 8px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.6);">
-            <div style="font-weight: 700; font-size: 12px;">${escapeHtml(d.place)}</div>
-            <div style="color: #888; font-size: 10px; margin-top: 2px;">${escapeHtml(d.country)}${d.startDate ? ' · ' + escapeHtml(d.startDate.slice(0, 4)) : ''}</div>
-          </div>
-        `}
-        onPointClick={(d: any) => onSelect(d as JourneyEntry)}
-        onPointHover={(d: any) => {
-          const controls = globeRef.current?.controls?.()
-          if (controls) controls.autoRotate = !d
-        }}
+        htmlElementsData={htmlElements}
+        htmlLat={(d: any) => d.lat}
+        htmlLng={(d: any) => d.lng}
+        htmlAltitude={(d: any) => d.altitude}
+        htmlElement={(d: any) => makePinEl(d.entry, () => onSelect(d.entry as JourneyEntry))}
         arcsData={arcs}
         arcLabel={(d: any) => `
           <div style="font-family: Inter, sans-serif; background: rgba(10,10,12,0.95); border: 1px solid rgba(0,255,135,0.4); padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 11px;">
