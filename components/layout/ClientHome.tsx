@@ -7,6 +7,7 @@ import Hero from '@/components/sections/Hero'
 import CareerTimeline from '@/components/sections/CareerTimeline'
 import ImpactDashboard from '@/components/sections/ImpactDashboard'
 import TechConstellation from '@/components/sections/TechConstellation'
+import Projects from '@/components/sections/Projects'
 import LifeTimeline from '@/components/sections/LifeTimeline'
 import SpecialTrackers from '@/components/sections/SpecialTrackers'
 import ImpossibleList from '@/components/sections/ImpossibleList'
@@ -33,6 +34,7 @@ export default function ClientHome({ data }: { data: PageData }) {
         <CareerTimeline career={data.career} />
         <ImpactDashboard metrics={data.impactMetrics} />
         <TechConstellation skillCategories={data.skillCategories} />
+        <Projects projects={data.projects} />
         <LifeTimeline entries={data.timeline} />
         <SpecialTrackers languages={data.languages} />
         <ImpossibleList achievements={data.achievements} />

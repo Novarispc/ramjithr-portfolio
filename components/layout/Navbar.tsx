@@ -7,6 +7,7 @@ import type { Personal } from '@/lib/content-schema'
 
 const NAV_LINKS = [
   { label: 'Experience', href: '#career' },
+  { label: 'Projects', href: '#projects' },
   { label: 'Timeline', href: '#timeline' },
   { label: 'Trackers', href: '#trackers' },
   { label: 'Goals', href: '#impossible' },

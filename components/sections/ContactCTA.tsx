@@ -1,6 +1,6 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Mail, Linkedin, FileText, ArrowRight, MapPin, Clock } from 'lucide-react'
+import { Mail, Linkedin, FileText, Github, ArrowRight, MapPin, Clock } from 'lucide-react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import type { Personal } from '@/lib/content-schema'
 
@@ -33,6 +33,17 @@ function buildContactOptions(personal: Personal) {
       download: false,
     },
   ]
+  if (personal.github) {
+    options.push({
+      icon: Github,
+      label: 'View on GitHub',
+      description: 'Browse open-source code and personal projects',
+      href: personal.github,
+      color: '#e2e8f0',
+      action: 'Open GitHub',
+      download: false,
+    })
+  }
   if (personal.resumeUrl) {
     options.push({
       icon: FileText,
@@ -95,7 +106,7 @@ export default function ContactCTA({ personal }: { personal: Personal }) {
         </ScrollReveal>
 
         {/* Contact cards */}
-        <div className="grid md:grid-cols-3 gap-4 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {CONTACT_OPTIONS.map((opt, i) => {
             const Icon = opt.icon
             return (
