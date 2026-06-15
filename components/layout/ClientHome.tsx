@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Hero from '@/components/sections/Hero'
+import { HeroScrollShowcase } from '@/components/sections/HeroScrollShowcase'
 import CareerTimeline from '@/components/sections/CareerTimeline'
 import ImpactDashboard from '@/components/sections/ImpactDashboard'
 import TechConstellation from '@/components/sections/TechConstellation'
@@ -31,6 +32,7 @@ export default function ClientHome({ data }: { data: PageData }) {
       <main className="public-root relative" style={{ visibility: loaded ? 'visible' : 'hidden' }}>
         <Navbar personal={data.personal} />
         <Hero personal={data.personal} stats={data.stats} rotatingChips={data.rotatingChips} />
+        <HeroScrollShowcase />
         <CareerTimeline career={data.career} />
         <ImpactDashboard metrics={data.impactMetrics} />
         <TechConstellation skillCategories={data.skillCategories} />
