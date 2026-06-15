@@ -18,6 +18,7 @@ import PersonalSide from '@/components/sections/PersonalSide'
 import ContactCTA from '@/components/sections/ContactCTA'
 import LoadingScreen from '@/components/ui/LoadingScreen'
 import CursorGlow from '@/components/ui/CursorGlow'
+import TelemetryHUD from '@/components/ui/TelemetryHUD'
 import type { PageData } from '@/lib/public-data'
 
 export default function ClientHome({ data }: { data: PageData }) {
@@ -26,6 +27,7 @@ export default function ClientHome({ data }: { data: PageData }) {
   return (
     <>
       <CursorGlow />
+      {loaded && <TelemetryHUD />}
       <AnimatePresence>
         {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
       </AnimatePresence>
