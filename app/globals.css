@@ -164,9 +164,9 @@ body::before {
   --pl-muted:       #4a4a52;
   --pl-subtle:      #6b6b73;
   --pl-faint:       #8a8a90;
-  --pl-very-faint:  #b4b4ba;
-  --pl-accent:      #00a85a;
-  --pl-gold:        #a07a2a;
+  --pl-very-faint:  #9a9aa0;
+  --pl-accent:      #00733e;
+  --pl-gold:        #7a5e1a;
   --pl-card:        #ffffff;
   --pl-card-2:      #f5f5f2;
   --pl-card-3:      #ececea;
@@ -253,6 +253,29 @@ body::before {
 :root[data-theme="light"] .public-root [style*="background-color: #111"] {
   background-color: var(--pl-card) !important;
 }
+
+/* ─ Inline accent TEXT colors ────────────────────────────────────────────────
+   Components set brand/category colors via style={{ color }} (timeline year
+   markers, skill chips, project tech tags, etc). These escape the class-based
+   remaps above and render near-invisible on light bg (contrast ~1.2:1).
+   Remap each accent's *foreground* usage to an AA-readable variant. The match
+   targets "color: rgb(...)"; a solid accent used as background serializes as
+   "background-color: rgb(...)" and is restored to dark text further below. */
+:root[data-theme="light"] .public-root [style*="color: rgb(0, 255, 135)"],
+:root[data-theme="light"] .public-root [style*="color: rgba(0, 255, 135"]   { color: #00733e !important; }
+:root[data-theme="light"] .public-root [style*="color: rgb(201, 168, 76)"],
+:root[data-theme="light"] .public-root [style*="color: rgba(201, 168, 76"]  { color: #7a5e1a !important; }
+:root[data-theme="light"] .public-root [style*="color: rgb(96, 165, 250)"],
+:root[data-theme="light"] .public-root [style*="color: rgba(96, 165, 250"]  { color: #1d4ed8 !important; }
+:root[data-theme="light"] .public-root [style*="color: rgb(167, 139, 250)"],
+:root[data-theme="light"] .public-root [style*="color: rgba(167, 139, 250"] { color: #5b21b6 !important; }
+:root[data-theme="light"] .public-root [style*="color: rgb(249, 115, 22)"],
+:root[data-theme="light"] .public-root [style*="color: rgba(249, 115, 22"]  { color: #9a3412 !important; }
+
+/* Restore near-black text on solid-accent buttons (their green bg matched the
+   green text rule above). Only solid rgb(...) bg matches — tinted rgba() does not. */
+:root[data-theme="light"] .public-root [style*="background-color: rgb(0, 255, 135)"],
+:root[data-theme="light"] .public-root [style*="background-color: #00ff87"] { color: #062013 !important; }
 
 /* ─ Globe / image-heavy panels: keep dark for visual punch ───────────────── */
 /* Globe canvas always renders against black — leave alone. */

@@ -35,13 +35,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           style={{ height: '180px' }}
         >
           {project.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-500"
-              style={{ transform: hovered ? 'scale(1.04)' : 'scale(1)' }}
-            />
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover transition-transform duration-500"
+                style={{ transform: hovered ? 'scale(1.04)' : 'scale(1)' }}
+              />
+              {/* Fade the image into the card — only over real images */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent opacity-60" />
+            </>
           ) : (
             <div
               className="w-full h-full flex items-center justify-center"
@@ -50,8 +54,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               <Code2 size={40} className="text-[#00ff87]/20" />
             </div>
           )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent opacity-60" />
         </div>
 
         {/* Content */}
