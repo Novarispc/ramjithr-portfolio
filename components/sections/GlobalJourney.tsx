@@ -41,9 +41,8 @@ export default function GlobalJourney({ journey, globeSettings }: { journey: Jou
   const [yearFilter, setYearFilter] = useState<string>('all')
   const [countryFilter, setCountryFilter] = useState<string>('all')
 
-  useEffect(() => {
-    if (isMobile && view === 'globe') setView('timeline')
-  }, [isMobile])
+  // Globe is shorter on phones so it fits the viewport without dominating it.
+  const globeHeight = isMobile ? 380 : 560
 
   const years = useMemo(() => {
     const set = new Set<string>()
@@ -100,7 +99,7 @@ export default function GlobalJourney({ journey, globeSettings }: { journey: Jou
               className="inline-flex rounded-[10px] p-[3px]"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
-              <ToggleBtn active={view === 'globe'} onClick={() => setView('globe')} disabled={isMobile}>
+              <ToggleBtn active={view === 'globe'} onClick={() => setView('globe')}>
                 <Globe2 size={13} /> Globe
               </ToggleBtn>
               <ToggleBtn active={view === 'timeline'} onClick={() => setView('timeline')}>
@@ -128,12 +127,12 @@ export default function GlobalJourney({ journey, globeSettings }: { journey: Jou
         </ScrollReveal>
 
         <div style={{ position: 'relative' }}>
-          {view === 'globe' && !isMobile ? (
+          {view === 'globe' ? (
             <GlobeCanvas
               entries={filtered}
               selectedId={selected?.id}
               onSelect={entry => setSelected(entry)}
-              height={560}
+              height={globeHeight}
               globeSettings={globeSettings}
             />
           ) : (
