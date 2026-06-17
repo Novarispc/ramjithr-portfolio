@@ -38,6 +38,14 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
   const wrapRef = useRef<HTMLDivElement>(null)
   const sizeRef = useRef({ w: 0, h: height })
   const [countries, setCountries] = useState<any[]>([])
+  const [active, setActive] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 720)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     fetch(COUNTRIES_URL)
@@ -128,6 +136,34 @@ export default function GlobeCanvas({ entries, selectedId, onSelect, height = 54
       onMouseDown={e => (e.currentTarget.style.cursor = 'grabbing')}
       onMouseUp={e => (e.currentTarget.style.cursor = 'grab')}
     >
+      {/* Mobile tap-to-interact overlay */}
+      {isMobile && !active && (
+        <div
+          onTouchStart={e => { e.preventDefault(); setActive(true) }}
+          onClick={() => setActive(true)}
+          style={{
+            position: 'absolute', inset: 0, zIndex: 10,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            gap: 8,
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(2px)',
+            borderRadius: 18,
+            cursor: 'pointer',
+          }}
+        >
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <circle cx="18" cy="18" r="17" stroke="rgba(0,255,135,0.35)" strokeWidth="1.5" />
+            <path d="M18 10v16M10 18h16" stroke="#00ff87" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          <span style={{ color: '#00ff87', fontSize: 11, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+            Tap to interact
+          </span>
+          <span style={{ color: '#666', fontSize: 10, letterSpacing: '0.1em' }}>
+            Scroll outside to continue
+          </span>
+        </div>
+      )}
       <Globe
         ref={globeRef}
         width={sizeRef.current.w || undefined}
